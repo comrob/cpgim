@@ -14,7 +14,11 @@ from utils.robot_utils.updatable_provider import UpdatableProvider, ProviderCont
 from utils.robot_utils.sensory_providers import AccelerationProvider, YAxisAccTrqProvider, GenericProvider, OrientedPositionDisplacementRate, HeadingChangeRate
 from utils.robot_utils import robot_utils as RU
 
-import robot.Robot as rob
+# try:/
+import robot.hexapod_sim.RobotHAL as rob
+# except:
+#     print("WARNING: robot package is not present. No VREP experiments can be done.")
+#     rob = None
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -162,18 +166,18 @@ def run_vrep_executor(model_exec: ModelExecutor, total_iteration_n,
                         callback_printer: callable = None, log_rate: int = 1000
                       ):
     # STARTING ROBOT
-    robot = rob.Robot()
+    robot = rob.RobotHAL(simulation_step=1)
     # record = R.init_record(model_exec)
     recorder = R.Recorder(results_path, target_experiment_name, record_capacity, lambda: R.init_record(model_exec))
 
     # FINISHING BINDERS (Inputs)
     # get_acceleration = robot.robot.get_imu_data
-    get_orientation = robot.robot.get_robot_orientation
-    get_position = robot.robot.get_robot_position
+    get_orientation = robot.get_robot_orientation
+    get_position = robot.get_robot_position
     # get_joint_trqs = robot.robot.get_all_joint_torques
 
     # get_quaternion = lambda : [0,0,0,0]
-    get_quaternion = robot.robot.get_robot_quaternion
+    get_quaternion = robot.get_robot_quaternion
 
     # def forward_downward_acc():
     #     _a = get_acceleration()
@@ -199,10 +203,10 @@ def run_vrep_executor(model_exec: ModelExecutor, total_iteration_n,
     sensory_providers.get_provider("debug_loc").set_data_getter(get_position)
 
     # SETTING UP THE COMMANDERS (Outputs)
-    pose_commander = C.Commander(robot.robot.set_servo_position, C.get_filter_similar_commands(0.01))
+    pose_commander = C.Commander(robot.set_servo_position, C.get_filter_similar_commands(0.01))
 
     for jid in range(0, 19):
-        robot.robot.set_joint_torque(jid, 2.5)
+        robot.set_joint_torque(jid, 2.5)
     start_t = time.time()
     start_t_l = start_t
     sleep_time = 0.01

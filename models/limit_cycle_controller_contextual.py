@@ -507,7 +507,8 @@ def get_d_weights(state_num):
 def d_motor_expected(motor_err, weights, motor_lr, ctx_ctr_sel, regularization, decay=0.):
     active = xp.einsum("imjd,nmcdx,ix->injcx", motor_err, weights, ctx_ctr_sel, optimize=True) * motor_lr
     if np.sum(ctx_ctr_sel) > 0:
-        return active * 0.000001 - regularization * 0.01 - decay * 0.00001
+        return active * 0.0000001 - regularization * 0.01 #- decay * 0.00001
+        # return active * 0.000001 - regularization * 0.01 - decay * 0.00001 #FIXME
     else:
         return np.zeros(active.shape)
 
@@ -633,7 +634,8 @@ def model_quality_current_normed(ctx_e_mod, learn_e_mod, sensory_posterior_varia
 def model_quality_mean(quality_mean, quality):
     goes_down = quality < quality_mean
     goes_up = quality >= quality_mean
-    return (quality - quality_mean) * (goes_down * 0.02 + goes_up * 0.0005)
+    # return (quality - quality_mean) * (goes_down * 0.02 + goes_up * 0.0005) #FIXME
+    return (quality - quality_mean) * (goes_down * 0.08 + goes_up * 0.001)
 
 
 def model_qiality_variance(quality_variance, quality_mean, quality):

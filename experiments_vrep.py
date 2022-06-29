@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
         ##
         total_iteration_n = 300000
-        continue_to =1
+        continue_to =0
         # start_at = 1440
         start_at = -1
         record_jump = 100
