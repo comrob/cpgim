@@ -42,7 +42,7 @@ def _get_nmcdx_shape(record):
     return w[0, :, :, :, :, :].shape
 
 
-def context_control_evol(record, fig: Figure):
+def context_control_evol(record, fig: Figure, selected_contexts=None):
     fig.suptitle("Context Control Evolution (log values)")
     t = record["t"]
     q_perf = record[M.REAL_PERFORMANCE_QUALITY]
@@ -52,7 +52,8 @@ def context_control_evol(record, fig: Figure):
     th_out = record[M.CONTEXT_QUALITY_OUTER_THRESHOLD_DYN]
 
     a = record[M.CONTEXT_ACTIVABLE][:, 0, :]
-
+    if selected_contexts is None:
+        selected_contexts = [i for i in range(a.shape[-1])]
     opt_fr = record[M.CONTEXT_IS_BEST_FREEZED][:, 0, :]
     opt_ho = record[M.CONTEXT_IS_BEST_HOT][:, 0, :]
 
@@ -81,17 +82,18 @@ def context_control_evol(record, fig: Figure):
     fig_a.hlines([-1.5 * i - 0.1 for i in range(7)], np.min(t), np.max(t), colors='k', alpha=0.5)
     fig_a.hlines([-1.5 * i + 1.1 for i in range(7)], np.min(t), np.max(t), linestyles='--', colors='k', alpha=0.5)
 
-    for ctx in range(a.shape[-1]):
-        fig_q.plot(t, np.log10(q[:, ctx]), linestyle='--', color=COLORS[ctx], alpha=0.5)
-        fig_q.plot(t, np.log10(q_mu[:, ctx]), color=COLORS[ctx], label="log " + str(ctx))
+    # for ctx in range(a.shape[-1]):
+    for i, ctx in enumerate(selected_contexts):
+        fig_q.plot(t, np.log10(q[:, ctx]), linestyle='--', color=COLORS[i], alpha=0.5)
+        fig_q.plot(t, np.log10(q_mu[:, ctx]), color=COLORS[i], label="log " + str(ctx))
 
-        fig_a.plot(t, a[:, ctx] - 1.5 * 0, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, opt_fr[:, ctx] - 1.5 * 1, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, opt_ho[:, ctx] - 1.5 * 2, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, lrn_s[:, ctx] - 1.5 * 3, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, ctr_s[:, ctx] - 1.5 * 4, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, cmd_s[:, ctx] - 1.5 * 5, color=COLORS[ctx], alpha=0.8)
-        fig_a.plot(t, lrn_state[:, ctx] - 1.5 * 6, color=COLORS[ctx], alpha=0.8)
+        fig_a.plot(t, a[:, ctx] - 1.5 * 0, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, opt_fr[:, ctx] - 1.5 * 1, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, opt_ho[:, ctx] - 1.5 * 2, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, lrn_s[:, ctx] - 1.5 * 3, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, ctr_s[:, ctx] - 1.5 * 4, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, cmd_s[:, ctx] - 1.5 * 5, color=COLORS[i], alpha=0.8)
+        fig_a.plot(t, lrn_state[:, ctx] - 1.5 * 6, color=COLORS[i], alpha=0.8)
 
     fig_a.set_yticks([-1.5 * i for i in range(7)])
     fig_a.set_yticklabels(
