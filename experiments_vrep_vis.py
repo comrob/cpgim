@@ -31,11 +31,17 @@ root_folder = RESULTS_PATH
 # file_name = "hexapod_goal_reaching_ab_cpg_sync_frq400_str10.hdf5"
 # file_name = "hexapod_goal_reaching_ab_cpg_sync_frq420_str10.hdf5"
 # file_name = "hexapod_goal_reaching_ab_cpg_sync_frq533_str10.hdf5"
-file_name = "hexapod_goal_reaching_ab_cpg_sync_frq666_str10.hdf5"
-# file_name = "learning_hexapod_a_0.hdf5"
+# file_name = "hexapod_goal_reaching_ab_cpg_sync_frq666_str10.hdf5"
+# file_name = "hexapod_goal_reaching_300522_c_1.hdf5"
+# file_name = "hexapod_goal_reaching_010722_c_1.hdf5"
+# file_name = "hexapod_goal_reaching_020722_a_0.hdf5"
+# file_name = "hexapod_goal_reaching_020722_b_0.hdf5"
+# file_name = "hexapod_goal_reaching_020722_c_0.hdf5"
+# file_name = "hexapod_goal_reaching_020722_d_0.hdf5"
+file_name = "hexapod_goal_reaching_030722_d_0.hdf5"
 
-# mode = [1]
-mode = [2]
+mode = [1]
+# mode = [2]
 # mode = [3]
 # mode += [11]
 
@@ -65,22 +71,22 @@ if 1 in mode:
     ctr = Counter()
 
     # limit_cycle_controller.state_evolution(record, plt.figure(ctr()))
-    limit_cycle_controller.epicycle_evolution(record,  plt.figure(ctr()))
+    # limit_cycle_controller.epicycle_evolution(record,  plt.figure(ctr()))
 
     limit_cycle_controller_contextual.context_control_evol(record, plt.figure(ctr()))
-    limit_cycle_controller_contextual.context_quality_evol(record, plt.figure(ctr()), log=False)
-    limit_cycle_controller_contextual.motor_context_convergence(record, plt.figure(ctr()), squared_norm=True)
-    limit_cycle_controller_contextual.multi_control_outputs(record, plt.figure(ctr()))
+    # limit_cycle_controller_contextual.context_quality_evol(record, plt.figure(ctr()), log=False)
+    # limit_cycle_controller_contextual.motor_context_convergence(record, plt.figure(ctr()), squared_norm=True)
+    # limit_cycle_controller_contextual.multi_control_outputs(record, plt.figure(ctr()))
     #
-    limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=0, size=2)
-    limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=1, size=2)
+    # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=0, size=2)
+    # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=1, size=2)
     # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=2, size=2)
     # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=3, size=2)
     # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=1, size=4)
     # limit_cycle_controller.y_mem_evolution(record, plt.figure(ctr()), sensor_m=2, size=4)
     #
     #
-    limit_cycle_controller.u_mem_evolution(record, plt.figure(ctr()), motor_n=0, size=2)
+    # limit_cycle_controller.u_mem_evolution(record, plt.figure(ctr()), motor_n=0, size=2)
     # limit_cycle_controller.u_mem_evolution(record, plt.figure(ctr()), motor_n=1, size=4)
     # limit_cycle_controller.u_mem_evolution(record, plt.figure(ctr()), motor_n=2, size=4)
     # robot_position_control.position_command_evolution(record, plt.figure(ctr()))
@@ -107,7 +113,7 @@ if 1 in mode:
     #
     # robot_goal_differential_control.diff_control_evol(record, plt.figure(ctr()))
     # robot_goal_differential_control.pid_evol(record, plt.figure(ctr()))
-    for i in [1, 2]:
+    for i in [0, 1]:
         limit_cycle_controller_contextual.model_context_parameter_convergence(record, plt.figure(ctr()), context=i)
 
         limit_cycle_controller_contextual.multi_io_matricies(record, plt.figure(ctr()), ctx=i, sensor_modewise_norming=True)
@@ -125,14 +131,14 @@ if 1 in mode:
         # limit_cycle_controller_contextual.bias_evolution(record, plt.figure(ctr()), ctx=i)
         # limit_cycle_controller_contextual.weight_matrix_evolution(record, plt.figure(ctr()), size=10,ctx=i)
 
-        limit_cycle_controller_contextual.phase_combined_sensory_evolution(record, plt.figure(ctr()), ctx=i)
+        # limit_cycle_controller_contextual.phase_combined_sensory_evolution(record, plt.figure(ctr()), ctx=i)
         # robot_position_control.u_leg_position(record, plt.figure(ctr()), ctx=i)
 
         # limit_cycle_controller_contextual.sensory_posterior_variance(record, plt.figure(ctr()), ctx=i)
         # robot_position_control.regularization_leg_budget(record, plt.figure(ctr()), ctx=i)
         # limit_cycle_controller_contextual.u_dif_evolution(record, plt.figure(ctr()), ctx=i)
         #
-        lrn_durs, ctr_durs, _ = limit_cycle_controller_contextual.get_context_management_durations(record, ctx=i)
+        # lrn_durs, ctr_durs, _ = limit_cycle_controller_contextual.get_context_management_durations(record, ctx=i)
         # for m in [0, 1, 3]:
         #     for lrn_dur in lrn_durs:
         #         limit_cycle_controller_contextual.posterior_sensory_variance_detail(record, plt.figure(ctr()), t=lrn_dur[1][0],

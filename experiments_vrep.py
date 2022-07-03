@@ -45,28 +45,28 @@ def log_callback(state):
 def experiment_filename(_source, _setup, _tag):
     return "{}_{}_{}".format(_source, _setup, _tag)
 
-
+# TODO folder creation
 if __name__ == '__main__':
     extra_tag = "_bd10"
     mode = [EXP_HEXAPOD_GOAL_REACHING]
 
     if EXP_HEXAPOD_GOAL_REACHING in mode:
-        extra_tag = "_300522_c"
+        extra_tag = "_030722_d"
 
         target_experiment_tag = EXP_HEXAPOD_GOAL_REACHING + extra_tag
         num_state_centers = 8
         sensor_dim = 4
 
         ##
-        total_iteration_n = 300000
-        continue_to =0
+        total_iteration_n = 200000
+        continue_to = 1
         # start_at = 1440
         start_at = -1
         record_jump = 100
         record_capacity = 40
         sens_window = 40
 
-        # command_override_start = 1000
+        # command_override_start = 1500
         command_override_start = 0
 
 
