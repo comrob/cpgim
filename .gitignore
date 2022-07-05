@@ -1,0 +1,6 @@
+# pycache bussiness
+*__pycache__/*
+*.pyc
+
+# result binaries
+results/*

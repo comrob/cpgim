@@ -1,0 +1,11 @@
+cached-property
+cycler
+h5py
+kiwisolver
+matplotlib
+numpy
+Pillow
+pyparsing
+python-dateutil
+scipy
+six
