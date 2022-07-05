@@ -1,6 +1,6 @@
+#!/usr/bin/python3
 import argparse
 import experiments_vrep
-import os
 
 parser = argparse.ArgumentParser(description="CPG augmented Internal-Models bootstrapping - Hexapod experiment run.\n"
                                              "This script bootstraps the ensemble of internal models by controlling"

@@ -1,9 +1,13 @@
 
-# Internal Model Learning for Limit Cycle Systems
-This package contains implementation of Feed Forward Network synchronized by Central Pattern Generator (CPG-NN),
-which learns limit-cycle system dynamics.
-Both CPG-NN and limit-cycle system are described by differential equations which are numerically integrated by
-dynsys_famework (also included in this package). 
+# Bootstrapping Internal Models augmented with Central Pattern Generator 
+This package implements bootstrapping algorithm that actively learns Internal Models
+augmented with Central Pattern Generator (CPG-IM) [1]. The CPG-IM ensemble models and controls
+rhythmic motion, *gait*, in order to reach given target behavior. 
+
+This experiment demonstrates following functionalities of the CPG-IM ensemble:
+1. Incremental goal-oriented gait dynamics model learning,
+2. Damage detection,
+3. Gait control inference.
 
 ## Installation
 The software is tested on Ubuntu 20.4 and Windows 11. To run the experiments the python libraries and the simulator must be installed:
@@ -11,7 +15,7 @@ The software is tested on Ubuntu 20.4 and Windows 11. To run the experiments the
 1. The software requires Python 3.8.0 with packages listed in *requirements.txt* file.
 To install the requirements run:
 ```setup
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 2. The robot is simulated in [CoppeliaSim](https://www.coppeliarobotics.com/downloads) 
@@ -20,7 +24,7 @@ which should be installed on your machine (tested on EDU distribution version 4.
 
 ## Training the Internal Model Ensemble
 
->Before running the experiment in the simulator, we encourage you to try this Jupyter Notebook Demo, where we train
+>Before running the experiment in the simulator, we encourage you to try this [Jupyter Notebook Demo](mass_spring_damper_demo.ipynb), where we train
 to control simple mass-spring-damper system. You will see how the *internal model* learns to
 control a low-dimensional system. The demo will also introduce you to the *DynSys framework*
 which numerically solves differential equations. 
@@ -33,13 +37,14 @@ controller compensate.
 ### Running the experiment
 First we prepare the simulated environment:
 1. Launch CoppeliaSim
-2. Open the ```scenes\plain.ttt``` scene.
+2. Open the ```resources\scenes\plain.ttt``` scene.
 
-You should see the hexapod robot which we are about to make move (PICREL).
+You should see the hexapod robot which we are about to make move.
+![](resources/scene_pic.png)
 
 Now we just run the python script
 ```train
-python train.py <experiment_run_tag> <number_of_iterations>
+python3 train.py <experiment_run_tag> <number_of_iterations>
 ```
 where *model_tag* identifies the experiment run, and *number_of_iterations* is number of numerical integration steps.
 > Set the *number_of_iterations* at most to 400 000.
@@ -49,60 +54,94 @@ where *model_tag* identifies the experiment run, and *number_of_iterations* is n
 
 For more options consult 
 ```train
-python train.py -h
+python3 train.py -h
 ```
 
 The robot should start randomly moving with its legs (motor-babbling). Usually it starts walking at 100 000th iteration.
 The leg paralysis is introduced at 150 000th iteration.
 
-## Results analysis
+### Results analysis
 
 The entire run is stored in the hdf5 file(s) in the ```results\vrep_poc``` directory. And now we simply analyse
 the stored data. Just run
 ```eval1
-python evaluate.py <experiment_run_tag>
+python3 evaluate.py <experiment_run_tag>
 ```
 and new directory ```results\nn\<experiment_run_tag>``` will be generated with plotted data. 
 
 For more options consult 
 ```train
-python evaluate.py -h
+python3 evaluate.py -h
 ```
 
 Now we describe what each plot is supposed to show.  
 
-## Pre-trained Models
-(Will be there pretrained models?)
-In *results* directory there is already included pre-trained model: *modelVDP_lite.hdf5*.
-To generate evaluations run following commands:
-```eval
-python evaluate.py exp modelVDP one_pulse
-python evaluate.py exp modelVDP perturb_and_sync
-python evaluate.py exp modelVDP amplitude_grow
-python evaluate.py exp modelVDP control_simple
-```
+### Results
 
-## Results
+####The CPG-IM bootstrapping overview
+![](resources/figures/y_ref_clearance.png)\
+The colors of the top bar distinguish activity of different internal models (IMs).
+The activity and whether the IM is in the *Learning* or *Controlling* stage is determined by the Estimation Error.
+In the Velocity and Yaw subplots we can see evolution of respective sensory observations.
+During *Learning* the IM generates motor-babbling while during *Controlling* the IM tries to approach the target behavior (green).
+How well the IM controls the robot is measured by Performance control at the bottom.
+The behavior of the system is changed by introduced damage (red vertical line).
 
-The CPG-NN discovers the approximate dynamics of the limit-cycle system through perturbations.
-If the CPG is not synchronized then the perturbations shift the limit-cycle system and the weights does not converge.\
-![](results/_pics/learning_convergence.png)\
-The result model can be used for sensory output estimation, when we send pulse into the limit-cycle system.\
-![](results/_pics/one_pulse_overlap.png)\
-The synchronization ability of CPG is essential, as we can see in the comparison of synchronized and unsynchronized 
-CPG-NN estimations.
-![](results/_pics/compare_perturbation_syncing.png)\
-The learned dynamics are only approximate, if we diverge from regular state too far, the estimation error increases.
-![](results/_pics/growing_amplitude.png)\
-The linear model of limit-cycle can be used for finding optimal control with respect to given sensory reference. Again,
-we compare synchronized and unsynchronized CPG-NN.\
-![](results/_pics/period_comparison_overlap_with_control.png)
-![](results/_pics/period_comparison_overlap_with_control_unsynced.png)
+####Movement of the robot on XY coordinate plane
+![](results/figures/navigation.png)\
+The trajectory of the robot is shaped by different IMs which are in control.
+Each marker color corresponds to IM that is in *Controlling* stage during traversal (colors also corresponds to the figure above).
+
+####Transit between Internal Models
+![](resources/figures/estimation_evol_1.png)\
+![](resources/figures/estimation_evol_2.png)\
+Each transition occurs because a *Controlling* IM is has too high Estimation Error.
+After transition a new IM starts *Learning*.
+
+####Leg damage event
+![](resources/figures/estimation_evol_1.png)\
+As the damage occurs, the estimation and reality diverge.
+Thus the Estimation Error grows until eventually the damage is detected.
+
+####Gait pattern statistics
+We show gaits inferred during the *Controlling* stage of each IM.\
+![](resources/figures/avg_ctx_0.png)
+![](resources/figures/std_ctx_0.png)\
+Each matrix show the command that was send during the particular *motor phase* (column) to the particular *joint*(row).
+We show the average of these values and their standard deviation, which indicate which joints were changed the most.\
+![](resources/figures/avg_ctx_1.png)
+![](resources/figures/std_ctx_1.png)\
+The second IM usually generates gaits that are able to crawl in given direction.\
+![](resources/figures/avg_ctx_2.png)
+![](resources/figures/std_ctx_2.png)\
+The third IM usually compensates the introduced middle-left coxa paralysis (L2c).
+
+![](resources/robot_model.png)\
+Each joint label is composed of leg label (above) and proximity label: *c* for body-coxa and *f* for coxa-femur joint.
+####Learned weights
+Each pair of sensor and motor has an unique interaction which is learned by the IM.
+Whe show portfolio of all trained parameters for each IM.
+> The weight matrix is shown on simpler example at the end of the [Jupyter Notebook Demo](mass_spring_damper_demo.ipynb). 
+
+![](resources/figures/W_ctx0.png)
+![](resources/figures/W_ctx1.png)
+![](resources/figures/W_ctx2.png)
 
 
-#### Project structure
-The equations are organized into three files.
- - **models/limit_cycle_controller.py** has CPG-NN implementation.
- - **models/limit_cycle_system.py** contains Van der Pol oscillator implementation.
- - **experiments_nips.py** contain experiment setup specifications and couples the
-CPG-NN with the limit cycle system.
+[//]: # (## Pre-trained Model)
+
+[//]: # (We provide pretrained model on [Google Drive]&#40;https://drive.google.com/drive/folders/1MLSIO0b1cgfyAUp4vYoweAD2h8_wvRVX?usp=sharing&#41;.)
+
+[//]: # (Download and put all parts into the ```results\vrep_poc``` directory. Then run)
+
+[//]: # (```eval)
+
+[//]: # (python3 evaluate.py 030722_d)
+
+[//]: # (```)
+
+[//]: # (which should generate the same figures as we show above.)
+
+
+[1] R. Szadkowski and J. Faigl, Internal Models With Central Pattern Generator Estimate and Control Gait Dynamics, 
+(unpublished)

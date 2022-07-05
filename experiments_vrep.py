@@ -181,6 +181,5 @@ def main(experiment_run_tag, total_iteration_n=200000, continue_to_run_part=None
                                                  callback_printer=log_callback, record_capacity=record_capacity)
 
 
-# TODO folder creation
 if __name__ == '__main__':
    main("_04072022_a", total_iteration_n=350000)

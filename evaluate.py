@@ -1,6 +1,6 @@
+#!/usr/bin/python3
 import argparse
 import nn_journal_vis
-import os
 
 parser = argparse.ArgumentParser(description="CPG augmented Internal-Models bootstrapping - Hexapod experiment visualisation.\n"
                                  "This script visualises results from the goal reaching experiment."
