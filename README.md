@@ -10,7 +10,7 @@ This experiment demonstrates following functionalities of the CPG-IM ensemble:
 3. Gait control inference.
 
 ## Installation
-The software is tested on Ubuntu 20.4 and Windows 11. To run the experiments the python libraries and the simulator must be installed:
+The software is tested on Ubuntu 20.4. To run the experiments the python libraries and the simulator must be installed:
 
 1. The software requires Python 3.8.0 with packages listed in *requirements.txt* file.
 To install the requirements run:
@@ -46,7 +46,7 @@ Now we just run the python script
 ```train
 python3 train.py <experiment_run_tag> <number_of_iterations>
 ```
-where *model_tag* identifies the experiment run, and *number_of_iterations* is number of numerical integration steps.
+where *experiment_run_tag* can be any string which will identify the experiment run, and *number_of_iterations* is number of numerical integration steps.
 > Set the *number_of_iterations* at most to 400 000.
 > However such run could take 3 hours (Ubuntu20.4, Intel I7, 16GB RAM). 
 > We recommend you to separate the run into shorter runs.
@@ -78,7 +78,7 @@ Now we describe what each plot is supposed to show.
 
 ### Results
 
-####The CPG-IM bootstrapping overview
+#### The CPG-IM bootstrapping overview
 ![](resources/figures/y_ref_clearance.png)\
 The colors of the top bar distinguish activity of different internal models (IMs).
 The activity and whether the IM is in the *Learning* or *Controlling* stage is determined by the Estimation Error.
@@ -87,23 +87,23 @@ During *Learning* the IM generates motor-babbling while during *Controlling* the
 How well the IM controls the robot is measured by Performance control at the bottom.
 The behavior of the system is changed by introduced damage (red vertical line).
 
-####Movement of the robot on XY coordinate plane
+#### Movement of the robot on XY coordinate plane
 ![](results/figures/navigation.png)\
 The trajectory of the robot is shaped by different IMs which are in control.
 Each marker color corresponds to IM that is in *Controlling* stage during traversal (colors also corresponds to the figure above).
 
-####Transit between Internal Models
+#### Transit between Internal Models
 ![](resources/figures/estimation_evol_1.png)\
 ![](resources/figures/estimation_evol_2.png)\
 Each transition occurs because a *Controlling* IM is has too high Estimation Error.
 After transition a new IM starts *Learning*.
 
-####Leg damage event
+#### Leg damage event
 ![](resources/figures/estimation_evol_1.png)\
 As the damage occurs, the estimation and reality diverge.
 Thus the Estimation Error grows until eventually the damage is detected.
 
-####Gait pattern statistics
+#### Gait pattern statistics
 We show gaits inferred during the *Controlling* stage of each IM.\
 ![](resources/figures/avg_ctx_0.png)
 ![](resources/figures/std_ctx_0.png)\
@@ -118,7 +118,7 @@ The third IM usually compensates the introduced middle-left coxa paralysis (L2c)
 
 ![](resources/robot_model.png)\
 Each joint label is composed of leg label (above) and proximity label: *c* for body-coxa and *f* for coxa-femur joint.
-####Learned weights
+#### Learned weights
 Each pair of sensor and motor has an unique interaction which is learned by the IM.
 Whe show portfolio of all trained parameters for each IM.
 > The weight matrix is shown on simpler example at the end of the [Jupyter Notebook Demo](mass_spring_damper_demo.ipynb). 
