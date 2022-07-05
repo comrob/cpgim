@@ -95,7 +95,8 @@ def model(mep: ModelExecutorParameters,
                                      perturbation_probability=0.02, motor_command_override=False,
                                      is_model_lr_external=False, is_control_lr_external=False,
                                      dynamic_outer_threshold=False, regularization_name=None,
-                                     epicycle_perturbation_eps=1., no_external_perturbation=True
+                                     epicycle_perturbation_eps=1., no_external_perturbation=True,
+                                     q_mean_up_lr=0.0005, q_mean_down_lr=0.02, u_exp_act_lr=1e-6
           ):
     if is_model_learned:
         model_learning_rate = RMS_LR
@@ -179,7 +180,7 @@ def model(mep: ModelExecutorParameters,
     mep.add(RMS_D + MOTOR_EXPECTED,
             (MOTOR_ERROR_FILTERED, MODEL_WEIGHTS, MOTOR_LEARNING_RATE,
              CONTEXT_CONTROL_SELECTION, regularization_name),
-            d_motor_expected)
+            get_d_motor_expected(u_exp_act_lr=u_exp_act_lr))
 
     mep.add(_D + RMS_MOTOR_EXPECTED, (RMS_MOTOR_EXPECTED, RMS_D + MOTOR_EXPECTED), rms_prop_learning_rate(RMS_RO),
             default_initial_values={RMS_MOTOR_EXPECTED: xp.zeros((1, motor_dim, 1, motor_segments_num, context_num))})
@@ -213,7 +214,8 @@ def model(mep: ModelExecutorParameters,
             (CONTEXT_MODEL_ERROR, MODEL_ERROR, PROB_VAR_SENSORY_MOTOR, CONTEXT_COMMANDING_SELECTION, STATE_PHASE_ACTIVATOR),
             model_quality_current_normed)
     # Model Quality statistics
-    mep.add(_D + CONTEXT_MODEL_QUALITY_MEAN, (CONTEXT_MODEL_QUALITY_MEAN, CONTEXT_MODEL_QUALITY), model_quality_mean,
+    mep.add(_D + CONTEXT_MODEL_QUALITY_MEAN, (CONTEXT_MODEL_QUALITY_MEAN, CONTEXT_MODEL_QUALITY),
+            get_model_quality_mean(q_mean_down_lr=q_mean_down_lr, q_mean_up_lr=q_mean_up_lr),
             default_initial_values={CONTEXT_MODEL_QUALITY_MEAN: xp.zeros((1, context_num)) + model_quality_upper_bound})
     mep.add(_D + CONTEXT_MODEL_QUALITY_VARIANCE, (CONTEXT_MODEL_QUALITY_VARIANCE, CONTEXT_MODEL_QUALITY_MEAN, CONTEXT_MODEL_QUALITY),
             model_qiality_variance,
@@ -505,13 +507,14 @@ def get_d_weights(state_num):
 
 # MOTOR --------------------------------------------------
 
-def d_motor_expected(motor_err, weights, motor_lr, ctx_ctr_sel, regularization, decay=0.):
-    active = xp.einsum("imjd,nmcdx,ix->injcx", motor_err, weights, ctx_ctr_sel, optimize=True) * motor_lr
-    if np.sum(ctx_ctr_sel) > 0:
-        # return active * 0.0000001 - regularization * 0.01 #- decay * 0.00001
-        return active * TS.U_EXP_ACT_LR - regularization * 0.01 - decay * 0.00001 #FIXME
-    else:
-        return np.zeros(active.shape)
+def get_d_motor_expected(u_exp_act_lr):
+    def d_motor_expected(motor_err, weights, motor_lr, ctx_ctr_sel, regularization, decay=0.):
+        active = xp.einsum("imjd,nmcdx,ix->injcx", motor_err, weights, ctx_ctr_sel, optimize=True) * motor_lr
+        if np.sum(ctx_ctr_sel) > 0:
+            return active * u_exp_act_lr - regularization * 0.01 - decay * 0.00001
+        else:
+            return np.zeros(active.shape)
+    return d_motor_expected
 
 
 def motor_command(_motor_output, motor_command_perturbation, motor_phase_activator, commanding_sel, ctx_ctr_lr):
@@ -632,11 +635,12 @@ def model_quality_current_normed(ctx_e_mod, learn_e_mod, sensory_posterior_varia
     return e_m.reshape((1, ctx_e_mod.shape[-1]))
 
 
-def model_quality_mean(quality_mean, quality):
-    goes_down = quality < quality_mean
-    goes_up = quality >= quality_mean
-    # return (quality - quality_mean) * (goes_down * 0.02 + goes_up * 0.0005) #FIXME
-    return (quality - quality_mean) * (goes_down * TS.QUALITY_MEAN_DOWN_LR + goes_up * TS.QUALITY_MEAN_UP_LR)
+def get_model_quality_mean(q_mean_down_lr, q_mean_up_lr):
+    def model_quality_mean(quality_mean, quality):
+        goes_down = quality < quality_mean
+        goes_up = quality >= quality_mean
+        return (quality - quality_mean) * (goes_down * q_mean_down_lr + goes_up * q_mean_up_lr)
+    return model_quality_mean
 
 
 def model_qiality_variance(quality_variance, quality_mean, quality):
