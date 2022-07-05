@@ -4,7 +4,7 @@ This package implements bootstrapping algorithm that actively learns Internal Mo
 augmented with Central Pattern Generator (CPG-IM) [1]. The CPG-IM ensemble models and controls
 rhythmic motion, *gait*, in order to reach given target behavior. 
 
-This experiment demonstrates following functionalities of the CPG-IM ensemble:
+The experiment run by this package demonstrates following functionalities of the CPG-IM ensemble:
 1. Incremental goal-oriented gait dynamics model learning,
 2. Damage detection,
 3. Gait control inference.
@@ -31,8 +31,8 @@ which numerically solves differential equations.
 
 ### Experimental Setup
 We run the experiment where the simulated robot learns multiple internal models, which provides the
-robot with appropriate control. During the experiment the robot experiences leg damage, which must the
-controller compensate.
+robot with appropriate control. During the experiment the robot experiences leg damage, which the
+controller must learn to compensate.
 
 ### Running the experiment
 First we prepare the simulated environment:
