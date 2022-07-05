@@ -132,10 +132,11 @@ def numpyfy_record(record: RawRecord, dtype=np.float32, ignore_gradients=False) 
     return record_np
 
 
-def crop_record(record_np: NumpyRecord, start: int, end: int) -> NumpyRecord:
+def crop_record(record_np, start, end):
+    cropped_record_np = {}
     for k in record_np:
-        record_np[k] = record_np[k][start:end]
-    return record_np
+        cropped_record_np[k] = record_np[k][start:end]
+    return cropped_record_np
 
 
 def print_record_shapes(record: NumpyRecord):

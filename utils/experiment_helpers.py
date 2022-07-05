@@ -261,3 +261,33 @@ def run_vrep_executor(model_exec: ModelExecutor, total_iteration_n,
                 time.sleep(2)
             if not error_flag:
                 recorder.merge(delete_iteration_record_fragments=True)
+
+
+def get_experiment_run_parts_paths(directory_path, experiment_run_name):
+    file_paths = []
+    max_num = 0
+    while os.path.exists(os.path.join(directory_path, experiment_run_name + "_{}.hdf5".format(max_num))):
+        file_paths.append(os.path.join(directory_path, experiment_run_name + "_{}.hdf5".format(max_num)))
+        max_num += 1
+    return file_paths
+
+
+def merge_run_records(directory_path, experiment_run_name, delete_run_records=False, step=0.01):
+    file_paths = get_experiment_run_parts_paths(directory_path, experiment_run_name)
+    max_num = len(file_paths)
+
+    if max_num == 0:
+        raise IndexError("First experiment of {} not found.".format(experiment_run_name))
+
+    base_record = R.crop_record(R.load_records(file_paths[0])[0], 0, -1)
+    for i in range(1, max_num):
+        tmp_record = R.crop_record(R.load_records(file_paths[i])[0], 0, -1)
+        # tmp_record["t"] += base_record["t"][-1] + step
+        R.merge_records(base_record, tmp_record)
+
+    R.save_records(os.path.join(directory_path, experiment_run_name + ".hdf5"), base_record)
+
+    if delete_run_records:
+        for pth in file_paths:
+            os.remove(pth)
+
