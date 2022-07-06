@@ -10,7 +10,7 @@ The experiment run by this package demonstrates following functionalities of the
 3. Gait control inference.
 
 ## Installation
-The software is tested on Ubuntu 20.4. To run the experiments the python libraries and the simulator must be installed:
+The software is tested on Windows 11 and Ubuntu 20.4. To run the experiments the python libraries and the simulator must be installed:
 
 1. The software requires Python 3.8.0 with packages listed in *requirements.txt* file.
 To install the requirements run:
