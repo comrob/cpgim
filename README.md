@@ -37,7 +37,7 @@ controller must learn to compensate.
 ### Running the experiment
 First we prepare the simulated environment:
 1. Launch CoppeliaSim
-2. Open the ```resources\scenes\plain.ttt``` scene.
+2. Open the ```resources\scenes\plane.ttt``` scene.
 
 You should see the hexapod robot which we are about to make move.
 ![](resources/scene_pic.png)
