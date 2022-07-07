@@ -99,7 +99,7 @@ Each transition occurs because a *Controlling* IM is has too high Estimation Err
 After transition a new IM starts *Learning*.
 
 #### Leg damage event
-![](resources/figures/estimation_evol_1.png)\
+![](resources/figures/estimation_evol_damage.png)\
 As the damage occurs, the estimation and reality diverge.
 Thus the Estimation Error grows until eventually the damage is detected.
 
