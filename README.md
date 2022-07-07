@@ -88,7 +88,7 @@ How well the IM controls the robot is measured by Performance control at the bot
 The behavior of the system is changed by introduced damage (red vertical line).
 
 #### Movement of the robot on XY coordinate plane
-![](results/figures/navigation.png)\
+![](resources/figures/navigation.png)\
 The trajectory of the robot is shaped by different IMs which are in control.
 Each marker color corresponds to IM that is in *Controlling* stage during traversal (colors also corresponds to the figure above).
 
